@@ -1,7 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { CurrenciesService, ExchangeService } from './exchange.service';
 import { BadGatewayException } from '@nestjs/common';
 import { ExchangeInputType } from './types/exchange-input.type';
+import { CurrenciesService } from '../currencies/currencies.service';
+import { ExchangeService } from './exchange.service';
 
 const mockData = {
   from: 'USD',
