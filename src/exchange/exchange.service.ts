@@ -1,4 +1,5 @@
 import { BadGatewayException, Injectable } from '@nestjs/common';
+import { ExchangeInputType } from './types/exchange-input.type';
 
 export class CurrenciesService {
   async getCurrency(currency: string): Promise<any> {}
@@ -8,7 +9,7 @@ export class CurrenciesService {
 export class ExchangeService {
   constructor(private currienciesService: CurrenciesService) {}
 
-  async convertAmount({ from, to, amount }): Promise<any> {
+  async convertAmount({ from, to, amount }: ExchangeInputType): Promise<any> {
     if (!from || !to || !amount) {
       throw new BadGatewayException();
     }
