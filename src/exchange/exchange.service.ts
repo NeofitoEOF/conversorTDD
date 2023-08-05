@@ -1,8 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { BadGatewayException, Injectable } from '@nestjs/common';
 
 @Injectable()
 export class ExchangeService {
   async convertAmount({ from, to, amount }): Promise<any> {
-    throw new Error();
+    if (!from || !to || !amount) {
+      throw new BadGatewayException();
+    }
   }
 }
