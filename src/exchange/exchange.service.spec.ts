@@ -41,11 +41,7 @@ describe('ExchangeService', () => {
     });
     it('should be not throw if called with valid params', async () => {
       await expect(
-        service.convertAmount({
-          from: 'USD',
-          to: 'BRL',
-          amount: 1,
-        } as ExchangeInputType),
+        service.convertAmount(mockData as ExchangeInputType),
       ).resolves.not.toThrow();
     });
 
