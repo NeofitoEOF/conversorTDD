@@ -6,14 +6,17 @@ export class CurrenciesService {
 
 @Injectable()
 export class ExchangeService {
-  constructor(private currencyService: CurrenciesService) {}
+  constructor(private currienciesService: CurrenciesService) {}
 
   async convertAmount({ from, to, amount }): Promise<any> {
     if (!from || !to || !amount) {
       throw new BadGatewayException();
     }
-
-    const currencyFrom = this.currencyService.getCurrency(from);
-    const currencyTo = this.currencyService.getCurrency(to);
+    try {
+      const currencyFrom = await this.currienciesService.getCurrency(from);
+      const currencyTo = await this.currienciesService.getCurrency(to);
+    } catch (error) {
+      throw new Error(error);
+    }
   }
 }
