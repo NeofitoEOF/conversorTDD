@@ -1,6 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CurrenciesService, ExchangeService } from './exchange.service';
 import { BadGatewayException } from '@nestjs/common';
+import { ExchangeInputType } from './types/exchange-input.type';
+
+const mockData = {
+  from: 'USD',
+  to: 'BRL',
+  amount: 1,
+};
 
 describe('ExchangeService', () => {
   let service: ExchangeService;
@@ -34,16 +41,20 @@ describe('ExchangeService', () => {
     });
     it('should be not throw if called with valid params', async () => {
       await expect(
-        service.convertAmount({ from: 'USD', to: 'BRL', amount: 1 }),
+        service.convertAmount({
+          from: 'USD',
+          to: 'BRL',
+          amount: 1,
+        } as ExchangeInputType),
       ).resolves.not.toThrow();
     });
 
     it('should be called getCurrency twice', async () => {
-      await service.convertAmount({ from: 'USD', to: 'BRL', amount: 1 });
+      await service.convertAmount(mockData as ExchangeInputType);
       await expect(currenciesService.getCurrency).toBeCalledTimes(2);
     });
     it('should be called getCurrency with correct params', async () => {
-      await service.convertAmount({ from: 'USD', to: 'BRL', amount: 1 });
+      await service.convertAmount(mockData as ExchangeInputType);
       await expect(currenciesService.getCurrency).toBeCalledWith('USD');
       await expect(currenciesService.getCurrency).toBeCalledWith('BRL');
     });
@@ -52,7 +63,7 @@ describe('ExchangeService', () => {
         new Error(),
       );
       await expect(
-        service.convertAmount({ from: 'INVALID', to: 'BRL', amount: 1 }),
+        service.convertAmount(mockData as ExchangeInputType),
       ).rejects.toThrow();
     });
     it('should be return conversion value', async () => {
@@ -63,7 +74,7 @@ describe('ExchangeService', () => {
         value: 0.205,
       });
       expect(
-        await service.convertAmount({ from: 'USD', to: 'BRL', amount: 1 }),
+        await service.convertAmount(mockData as ExchangeInputType),
       ).toEqual({ amount: 4.878048780487805 });
 
       (currenciesService.getCurrency as jest.Mock).mockResolvedValueOnce({
@@ -73,7 +84,7 @@ describe('ExchangeService', () => {
         value: 1,
       });
       expect(
-        await service.convertAmount({ from: 'BRL', to: 'USD', amount: 1 }),
+        await service.convertAmount(mockData as ExchangeInputType),
       ).toEqual({ amount: 0.205 });
     });
   });
