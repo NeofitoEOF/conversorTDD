@@ -1,4 +1,4 @@
-import { Currencies } from './currencies.service';
+import { Currencies } from './currencies.entity';
 
 export class CurrenciesRepository {
   async getCurrency(currency: string): Promise<Currencies> {
