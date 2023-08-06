@@ -1,9 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { CurrenciesService, CurrenciesRepository } from './currencies.service';
+import { CurrenciesService } from './currencies.service';
 import {
   BadRequestException,
   InternalServerErrorException,
 } from '@nestjs/common';
+import { CurrenciesRepository } from './currencies.repository';
 
 describe('CurrenciesService', () => {
   let service: CurrenciesService;
