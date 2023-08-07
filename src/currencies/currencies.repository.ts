@@ -1,8 +1,14 @@
+import { EntityRepository, Repository } from 'typeorm';
 import { Currencies } from './currencies.entity';
-
-export class CurrenciesRepository {
+import { InternalServerErrorException } from '@nestjs/common';
+@EntityRepository(Currencies)
+export class CurrenciesRepository extends Repository<Currencies> {
   async getCurrency(currency: string): Promise<Currencies> {
-    return new Currencies();
+    const result = await this.findOne({ currency });
+    if (!result) {
+      throw new InternalServerErrorException();
+    }
+    return result;
   }
   async createCurrency({ currency, value }): Promise<Currencies> {
     return new Currencies();
