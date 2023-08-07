@@ -2,9 +2,11 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { CurrenciesRepository } from './currencies.repository';
 import { InternalServerErrorException } from '@nestjs/common/exceptions/internal-server-error.exception';
 import { Currencies } from './currencies.entity';
+import { NotFoundException } from '@nestjs/common';
 
 describe('CurrenciesRepository', () => {
   let repository;
+  let mockData;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -12,6 +14,8 @@ describe('CurrenciesRepository', () => {
     }).compile();
 
     repository = module.get<CurrenciesRepository>(CurrenciesRepository);
+    mockData = { currency: 'USD', value: 1 } as Currencies;
+    repository.save = jest.fn();
   });
 
   it('should be defined', () => {
@@ -29,10 +33,62 @@ describe('CurrenciesRepository', () => {
         new InternalServerErrorException(),
       );
     });
-    it('should be returns whenfindOne returns', async () => {
-      const mockData = { currency: 'USD', value: 1 } as Currencies;
+    it('should be returns when findOne returns', async () => {
       repository.findOne = jest.fn().mockReturnValue(mockData);
       expect(await repository.getCurrency('USD')).toEqual(mockData);
+    });
+  });
+  describe('createCurrenct()', () => {
+    it('should be called save with correct params', async () => {
+      repository.save = jest.fn().mockReturnValue(mockData);
+      await repository.createCurrency(mockData);
+      expect(repository.save).toBeCalledWith(mockData);
+    });
+    it('should be throw when save throw', async () => {
+      repository.save = jest.fn().mockRejectedValue(new Error());
+      await expect(repository.createCurrency(mockData)).rejects.toThrow();
+    });
+    it('should be returns created data', async () => {
+      expect(await repository.createCurrency(mockData)).toEqual(mockData);
+    });
+    it('should be throw if called with invalid params', async () => {
+      mockData.currency = 'INVALID';
+      await expect(repository.createCurrency(mockData)).rejects.toThrow();
+    });
+  });
+  describe('updateCurrency()', () => {
+    it('should be called findOne with correct params', async () => {
+      repository.findOne = jest.fn().mockReturnValue(mockData);
+      await repository.updateCurrency(mockData);
+      expect(repository.findOne).toBeCalledWith({ currency: 'USD' });
+    });
+    it('should be throw findOne with returns empty', async () => {
+      repository.findOne = jest.fn().mockReturnValue(undefined);
+      await expect(repository.updateCurrency(mockData)).rejects.toThrow(
+        new NotFoundException(`The currency ${mockData.currency} not found.`),
+      );
+    });
+    it('should be called save with correct params', async () => {
+      repository.findOne = jest.fn().mockReturnValue(mockData);
+      repository.save = jest.fn().mockReturnValue(mockData);
+      await repository.updateCurrency(mockData);
+      expect(repository.save).toBeCalledWith(mockData);
+    });
+    it('should be throw when save throw', async () => {
+      repository.findOne = jest.fn().mockReturnValue(mockData);
+      repository.save = jest.fn().mockRejectedValue(new Error());
+      await expect(repository.updateCurrency(mockData)).rejects.toThrow();
+    });
+    it('should be return updated data', async () => {
+      repository.findOne = jest
+        .fn()
+        .mockReturnValue({ currency: 'USD', value: 1 });
+      repository.save = jest.fn().mockReturnValue({});
+      const result = await repository.updateCurrency({
+        currency: 'USD',
+        value: 2,
+      });
+      expect(result).toEqual({ currency: 'USD', value: 2 });
     });
   });
 });
