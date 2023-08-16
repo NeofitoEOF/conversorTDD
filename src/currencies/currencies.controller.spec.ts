@@ -97,6 +97,12 @@ describe('CurrenciesController', () => {
         await controller.updateCurrency(mockData.currency, mockData.value);
         expect(service.updateCurrency).toBeCalledWith(mockData);
       });
+      it('should be returns when service returns', async () => {
+        (service.updateCurrency as jest.Mock).mockReturnValue(mockData);
+        expect(
+          await controller.updateCurrency(mockData.currency, mockData.value),
+        ).toEqual(mockData);
+      });
     });
   });
 });
